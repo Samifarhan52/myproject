@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}PetShop | Cart{% endblock %}
+
+{% block content %}
+<section class="section fade-in">
+  <div class="container">
+    <h2 class="section-title">Shopping Cart</h2>
+    <p class="section-subtitle">Review your selected items</p>
+
+    <div class="two-column">
+      <div class="card">
+        {% if products %}
+          <ul class="list">
+            {% for item in products %}
+              <li class="list-item">
+                <strong>{{ item.name }}</strong> (x{{ item.quantity }})<br />
+                Price each: ₹{{ '%.0f'|format(item.price) }}<br />
+                Subtotal: ₹{{ '%.0f'|format(item.subtotal) }}
+                <form method="POST" style="margin-top:0.3rem;">
+                  <input type="hidden" name="remove_id" value="{{ item.id }}" />
+                  <button type="submit" class="btn outline small-btn">Remove</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No items in cart. Go back to <a href="{{ url_for('pet_home') }}">PetShop</a>.</p>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h3>Order Summary</h3>
+        <p>Total Amount: <strong>₹{{ '%.0f'|format(total_amount) }}</strong></p>
+        {% if error %}
+          <p class="form-status error">{{ error }}</p>
+        {% endif %}
+        {% if products %}
+          <p class="muted small">
+            Click Proceed to Checkout to enter your details and complete the order.
+          </p>
+          <a href="{{ url_for('pet_checkout') }}" class="btn primary full-width" style="margin-top:0.8rem;">
+            Proceed to Checkout
+          </a>
+        {% endif %}
+        <a href="{{ url_for('pet_home') }}" class="btn outline full-width" style="margin-top:0.6rem;">
+          Continue Shopping
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

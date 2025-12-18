@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Bike Rental | Farhan Portfolio{% endblock %}
+
+{% block content %}
+<section class="section fade-in">
+  <div class="container">
+    <h2 class="section-title">BikeRent</h2>
+    <p class="section-subtitle">Choose a bike and book it online</p>
+
+    <div class="cards-grid">
+      {% for bike in bikes %}
+        <article class="card bike-card">
+          {% if bike.image_url %}
+            <img src="{{ bike.image_url }}" alt="{{ bike.name }}" class="bike-image" />
+          {% endif %}
+          <h3>{{ bike.name }}</h3>
+          <p class="muted">{{ bike.type }}</p>
+          <p class="bike-price">₹{{ '%.0f'|format(bike.price_per_day) }} / day</p>
+          <p class="muted small">{{ bike.description }}</p>
+          <a href="{{ url_for('bike_detail', bike_id=bike.id) }}" class="btn outline full-width" style="margin-top:0.5rem;">
+            View &amp; Book
+          </a>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

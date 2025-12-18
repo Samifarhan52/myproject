@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Booking Receipt | BikeRent{% endblock %}
+
+{% block content %}
+<section class="section center-section fade-in">
+  <div class="container">
+    <div class="receipt-card">
+      <h2>Bike Rental Receipt</h2>
+      <p class="muted small">Booking ID: <strong>#{{ booking.booking_id }}</strong></p>
+      <div class="receipt-grid">
+        <div>
+          <h3>Customer</h3>
+          <p><strong>{{ booking.customer_name }}</strong></p>
+          <p class="muted small">{{ booking.email }}</p>
+          <p class="muted small">{{ booking.phone }}</p>
+        </div>
+        <div>
+          <h3>Booking Details</h3>
+          <p><strong>Bike:</strong> {{ booking.name }} ({{ booking.type }})</p>
+          <p><strong>From:</strong> {{ booking.start_date }}</p>
+          <p><strong>To:</strong> {{ booking.end_date }}</p>
+        </div>
+        <div>
+          <h3>Payment</h3>
+          <p><strong>Total:</strong> ₹{{ '%.0f'|format(booking.total_price) }}</p>
+          <p class="muted tiny">Created at {{ booking.created_at }}</p>
+        </div>
+      </div>
+      <p class="muted small">
+        A copy of this receipt has been sent to your email.
+      </p>
+      <a href="{{ url_for('bike_rental') }}" class="btn outline">Back to Bike List</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

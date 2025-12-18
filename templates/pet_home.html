@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}PetShop | Farhan Portfolio{% endblock %}
+
+{% block content %}
+<section class="section fade-in">
+  <div class="container">
+    <div class="section-header-with-cart">
+      <div>
+        <h2 class="section-title">PetShop</h2>
+        <p class="section-subtitle">Mini pet products store</p>
+      </div>
+      <div>
+        <a href="{{ url_for('pet_cart') }}" class="btn outline">
+          Cart ({{ cart_count or 0 }})
+        </a>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      {% for p in products %}
+        <article class="card pet-card">
+          {% if p.image_url %}
+            <img src="{{ p.image_url }}" alt="{{ p.name }}" class="pet-image" />
+          {% endif %}
+          <h3>{{ p.name }}</h3>
+          <p class="muted small">{{ p.category }}</p>
+          <p class="pet-price">₹{{ '%.0f'|format(p.price) }}</p>
+          <p class="muted small">{{ p.description }}</p>
+          <form method="POST" class="inline-form">
+            <input type="hidden" name="product_id" value="{{ p.id }}" />
+            <button type="submit" class="btn primary full-width" style="margin-top:0.5rem;">
+              Add to Cart
+            </button>
+          </form>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

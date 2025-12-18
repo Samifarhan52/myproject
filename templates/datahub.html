@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}DataHub | Farhan Portfolio{% endblock %}
+
+{% block content %}
+<section class="section fade-in">
+  <div class="container">
+    <h2 class="section-title">DataHub</h2>
+    <p class="section-subtitle">Mini data management dashboard</p>
+
+    <div class="two-column">
+      <div class="card">
+        <h3>Add Record</h3>
+        <form method="POST" class="form">
+          <div class="form-group floating">
+            <input type="text" id="title" name="title" required />
+            <label for="title">Title</label>
+          </div>
+          <div class="form-group floating">
+            <textarea id="content" name="content" rows="3" required></textarea>
+            <label for="content">Content</label>
+          </div>
+          <button type="submit" class="btn primary full-width">Save</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Saved Records</h3>
+        {% if records %}
+          <ul class="list">
+            {% for r in records %}
+              <li class="list-item">
+                <div>
+                  <strong>{{ r.title }}</strong>
+                  <p class="muted small">{{ r.content }}</p>
+                  <p class="muted tiny">Saved at {{ r.created_at }}</p>
+                </div>
+                <form method="POST" action="{{ url_for('delete_datahub_record', record_id=r.id) }}">
+                  <button type="submit" class="btn outline small-btn">Delete</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">No records yet. Add your first one!</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

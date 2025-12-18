@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% block title %}Portfolio | Shaik Mohammad Farhanulla Sami{% endblock %}
+
+{% block content %}
+<section class="hero fade-in" id="hero">
+  <div class="container hero-container">
+    <div class="hero-text">
+      <p class="hero-intro">Hi, I'm</p>
+      <h1 class="hero-name">Shaik Mohammad<br />Farhanulla Sami</h1>
+      <h2 class="hero-role">
+        <span id="typeRole">Website Developer</span>
+        <span class="hero-cursor">|</span>
+      </h2>
+      <p class="hero-description">
+        I build modern, responsive, and user-friendly websites using
+        <strong>HTML</strong>, <strong>CSS</strong>, <strong>JavaScript</strong>, <strong>Python</strong>,
+        and <strong>SQL</strong>. I love turning ideas into clean, functional web experiences.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="#projects" class="btn primary">View Projects</a>
+        <a href="#contact" class="btn outline">Contact Me</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-tag">Open to Work</div>
+        <h3>Website Developer</h3>
+        <p>Frontend • Backend • Databases</p>
+        <ul>
+          <li>Responsive designs</li>
+          <li>Clean and maintainable code</li>
+          <li>Modern UI & UX patterns</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section fade-in" id="about">
+  <div class="container">
+    <h2 class="section-title">About Me</h2>
+    <p class="section-subtitle">Who I am and what I do</p>
+
+    <div class="about-grid">
+      <div>
+        <p>
+          I'm <strong>Shaik Mohammad Farhanulla Sami</strong>, Pursuing <strong>MCA in St.Joseph's University</strong>
+          a <strong>website developer</strong> with a passion for building
+          clean, responsive, and user-focused web applications. I enjoy using
+          <strong>HTML, CSS, JavaScript, Python, and SQL</strong> to bring
+          ideas to life on the web.
+        </p>
+        <p>
+          I like working on end-to-end solutions — from designing intuitive
+          interfaces to connecting them with reliable backend systems and
+          databases. I'm always learning and exploring modern web technologies
+          to improve performance, usability, and overall user experience.
+        </p>
+        <p>
+          My goal is to join a team or organization where I can contribute to
+          real-world projects, grow my skills, and deliver high-quality
+          digital products.
+        </p>
+      </div>
+      <div class="about-cards">
+        <div class="card">
+          <h3>What I Focus On</h3>
+          <ul>
+            <li>Responsive web design</li>
+            <li>Clean and readable code</li>
+            <li>Practical, real-world projects</li>
+            <li>Performance & usability</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Core Values</h3>
+          <ul>
+            <li>Consistency & discipline</strong></li>
+            <li>Continuous learning</li>
+            <li>Problem solving mindset</li>
+            <li>Delivering reliable work</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt fade-in" id="skills">
+  <div class="container">
+    <h2 class="section-title">Skills</h2>
+    <p class="section-subtitle">Technologies I work with</p>
+
+    <div class="skills-grid">
+      <div class="card">
+        <h3>Frontend</h3>
+        <ul>
+          <li>HTML5 (semantic markup)</li>
+          <li>CSS3 (Flexbox, Grid, animations)</li>
+          <li>Responsive design</li>
+          <li>JavaScript basics</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Backend & Logic</h3>
+        <ul>
+          <li>Python</li>
+          <li>Flask web framework</li>
+          <li>Form handling & validation</li>
+          <li>Authentication & sessions</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Databases</h3>
+        <ul>
+          <li>SQL (CRUD operations)</li>
+          <li>Relational schema design</li>
+          <li>SQLite / MySQL concepts</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Tools & Practices</h3>
+        <ul>
+          <li>Git & GitHub</li>
+          <li>VS Code</li>
+          <li>Debugging & problem solving</li>
+          <li>Clean, structured code</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section fade-in" id="projects">
+  <div class="container">
+    <h2 class="section-title">Projects</h2>
+    <p class="section-subtitle">Full-stack sample applications</p>
+
+    <div class="projects-grid">
+      <article class="card">
+        <span class="tag">Auth System</span>
+        <h3>AuthFlow – Login & Signup</h3>
+        <p>
+          A working authentication system with signup and login using Flask and SQLite.
+          Includes validation, sessions, and storage of user accounts.
+        </p>
+        <div class="project-tech">
+          <span>Flask</span><span>SQLite</span><span>HTML</span><span>CSS</span>
+        </div>
+        <div class="project-links">
+          <a href="{{ url_for('login') }}">Open Login</a>
+          <a href="{{ url_for('signup') }}">Open Signup</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="tag">Dashboard</span>
+        <h3>DataHub – Mini Data Management</h3>
+        <p>
+          A dashboard where you can add, view, and delete records.
+          Demonstrates CRUD operations with a clean UI.
+        </p>
+        <div class="project-tech">
+          <span>Flask</span><span>SQLite</span><span>HTML</span><span>CSS</span>
+        </div>
+        <div class="project-links">
+          <a href="{{ url_for('datahub') }}">Open DataHub</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="tag">Final Year</span>
+        <h3>BikeRent – Bike Rental System</h3>
+        <p>
+          A final-year style web app for renting bikes. Includes listings,
+          booking form, storage, and booking summary.
+        </p>
+        <div class="project-tech">
+          <span>Flask</span><span>SQLite</span><span>HTML</span><span>CSS</span>
+        </div>
+        <div class="project-links">
+          <a href="{{ url_for('bike_rental') }}">Open Bike Rental</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="tag">E-Commerce</span>
+        <h3>PetShop – Online Pet Store</h3>
+        <p>
+          A mini e-commerce application with product listing, cart, checkout,
+          and order records stored in database.
+        </p>
+        <div class="project-tech">
+          <span>Flask</span><span>SQLite</span><span>HTML</span><span>CSS</span><span>Sessions</span>
+        </div>
+        <div class="project-links">
+          <a href="{{ url_for('pet_home') }}">Open PetShop</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt fade-in" id="contact">
+  <div class="container">
+    <h2 class="section-title">Contact</h2>
+    <p class="section-subtitle">Let’s work together or just say hello</p>
+
+    <div class="contact-grid">
+      <div>
+        <p>
+          I'm always open to discussing new opportunities, collaborations, or
+          freelance work. If you have a project in mind or want to know more
+          about what I can do, feel free to reach out.
+        </p>
+        <ul class="contact-list">
+          <li><strong>Name:</strong> Shaik Mohammad Farhanulla Sami</li>
+          <li><strong>Role:</strong> Website Developer</li>
+          <li><strong>Email:</strong> <span>samifarhan64@gmail.com</span></li>
+          <li><strong>Location:</strong> India (IST)</li>
+        </ul>
+        <a
+          href="https://wa.me/917676808068"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn whatsapp-btn"
+        >
+          💬 WhatsApp Me
+        </a>
+      </div>
+
+      <form class="form" id="contactForm" action="{{ url_for('contact') }}" method="POST">
+        <div class="form-group floating">
+          <input type="text" id="contactName" name="name" required />
+          <label for="contactName">Your Name</label>
+        </div>
+        <div class="form-group floating">
+          <input type="email" id="contactEmail" name="email" required />
+          <label for="contactEmail">Your Email</label>
+        </div>
+        <div class="form-group floating">
+          <input type="tel" id="contactPhone" name="phone" required />
+          <label for="contactPhone">Mobile Number</label>
+        </div>
+        <div class="form-group floating">
+          <textarea id="contactMessage" name="message" rows="4" required></textarea>
+          <label for="contactMessage">Message</label>
+        </div>
+        <button type="submit" class="btn primary full-width">Send Message</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
