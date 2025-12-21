@@ -15,7 +15,7 @@ from modules.email_utils import send_email
 # App setup
 # -----------------------------------------------------------------------------
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev_secret_key")
 app.config["DATABASE"] = os.path.join(app.root_path, "database.db")
 
 # -----------------------------------------------------------------------------
@@ -93,6 +93,16 @@ def init_db():
     );
     """)
 
+    # DataHub
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS datahub_records (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    """)
+
     conn.commit()
     conn.close()
 
@@ -101,33 +111,22 @@ def seed_demo_data():
     conn = get_db()
     cur = conn.cursor()
 
-    # Seed Bikes
     cur.execute("SELECT COUNT(*) FROM bikes;")
     if cur.fetchone()[0] == 0:
         bikes = [
-            ("Yamaha MT-15", "Sport", 900, "Lightweight city sport bike.", "https://images.pexels.com/photos/977003/pexels-photo-977003.jpeg"),
-            ("Royal Enfield Classic 350", "Cruiser", 1100, "Comfortable long-ride cruiser.", "https://images.pexels.com/photos/210182/pexels-photo-210182.jpeg"),
-            ("KTM Duke 200", "Sport", 1200, "High performance naked sport bike.", "https://images.pexels.com/photos/136739/pexels-photo-136739.jpeg"),
-            ("Honda Activa 6G", "Scooter", 600, "Reliable daily commuting scooter.", "https://images.pexels.com/photos/806835/pexels-photo-806835.jpeg"),
-            ("TVS Apache RTR 160", "Sport", 850, "Balanced sport bike with good mileage.", "https://images.pexels.com/photos/595807/pexels-photo-595807.jpeg"),
-            ("Bajaj Pulsar NS200", "Sport", 1000, "Powerful and sporty street bike.", "https://images.pexels.com/photos/1413412/pexels-photo-1413412.jpeg"),
+            ("Yamaha MT-15", "Sport", 900, "Lightweight city sport bike.", ""),
+            ("Royal Enfield Classic 350", "Cruiser", 1100, "Comfortable long-ride cruiser.", ""),
         ]
         cur.executemany("""
         INSERT INTO bikes (name, type, price_per_day, description, image_url)
         VALUES (?, ?, ?, ?, ?);
         """, bikes)
 
-    # Seed Pets & Food
     cur.execute("SELECT COUNT(*) FROM pet_products;")
     if cur.fetchone()[0] == 0:
         pets = [
-            ("Golden Retriever", "Dog", 25000, "Friendly family dog.", "https://images.pexels.com/photos/1805164/pexels-photo-1805164.jpeg"),
-            ("German Shepherd", "Dog", 28000, "Loyal guard dog.", "https://images.pexels.com/photos/333083/pexels-photo-333083.jpeg"),
-            ("Persian Cat", "Cat", 18000, "Calm indoor cat.", "https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg"),
-            ("Parrot", "Bird", 4500, "Colorful talking bird.", "https://images.pexels.com/photos/45851/parrot-macaw-bird-feathers-45851.jpeg"),
-            ("Rabbit", "Small Pet", 3000, "Easy to maintain pet.", "https://images.pexels.com/photos/326012/pexels-photo-326012.jpeg"),
-            ("Premium Dog Food", "Food", 1200, "High-protein dog food.", "https://images.pexels.com/photos/6568956/pexels-photo-6568956.jpeg"),
-            ("Dry Cat Food", "Food", 950, "Nutritious cat food.", "https://images.pexels.com/photos/5731814/pexels-photo-5731814.jpeg"),
+            ("Golden Retriever", "Dog", 25000, "Friendly family dog.", ""),
+            ("Persian Cat", "Cat", 18000, "Calm indoor cat.", ""),
         ]
         cur.executemany("""
         INSERT INTO pet_products (name, category, price, description, image_url)
@@ -149,9 +148,7 @@ def current_user():
     if not uid:
         return None
     conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE id = ?;", (uid,))
-    user = cur.fetchone()
+    user = conn.execute("SELECT * FROM users WHERE id = ?;", (uid,)).fetchone()
     conn.close()
     return user
 
@@ -176,23 +173,28 @@ def index():
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
-        name = request.form["name"]
-        email = request.form["email"]
-        password = request.form["password"]
-
         conn = get_db()
         cur = conn.cursor()
+
+        email = request.form["email"]
         cur.execute("SELECT id FROM users WHERE email = ?;", (email,))
         if cur.fetchone():
             flash("Email already exists")
+            conn.close()
             return redirect(url_for("signup"))
 
-        cur.execute(
-            "INSERT INTO users (name, email, password_hash, created_at) VALUES (?, ?, ?, ?);",
-            (name, email, generate_password_hash(password), datetime.now().isoformat()),
-        )
+        cur.execute("""
+        INSERT INTO users (name, email, password_hash, created_at)
+        VALUES (?, ?, ?, ?);
+        """, (
+            request.form["name"],
+            email,
+            generate_password_hash(request.form["password"]),
+            datetime.now().isoformat()
+        ))
         conn.commit()
         conn.close()
+
         flash("Account created")
         return redirect(url_for("login"))
 
@@ -202,16 +204,14 @@ def signup():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
-
         conn = get_db()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE email = ?;", (email,))
-        user = cur.fetchone()
+        user = conn.execute(
+            "SELECT * FROM users WHERE email = ?;",
+            (request.form["email"],)
+        ).fetchone()
         conn.close()
 
-        if user and check_password_hash(user["password_hash"], password):
+        if user and check_password_hash(user["password_hash"], request.form["password"]):
             session["user_id"] = user["id"]
             return redirect(url_for("index"))
 
@@ -244,9 +244,6 @@ def bike_detail(bike_id):
     bike = conn.execute("SELECT * FROM bikes WHERE id = ?;", (bike_id,)).fetchone()
 
     if request.method == "POST":
-        name = request.form["name"]
-        email = request.form["email"]
-        phone = request.form["phone"]
         start = date.fromisoformat(request.form["start_date"])
         end = date.fromisoformat(request.form["end_date"])
         days = (end - start).days + 1
@@ -256,14 +253,20 @@ def bike_detail(bike_id):
         INSERT INTO bike_bookings
         (bike_id, customer_name, email, phone, start_date, end_date, total_price, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-        """, (bike_id, name, email, phone, start, end, total, datetime.now().isoformat()))
+        """, (
+            bike_id,
+            request.form["name"],
+            request.form["email"],
+            request.form["phone"],
+            start, end, total,
+            datetime.now().isoformat()
+        ))
         conn.commit()
         conn.close()
         return redirect(url_for("bike_rental"))
 
     conn.close()
     return render_template("bike_detail.html", bike=bike)
-
 
 # -----------------------------------------------------------------------------
 # Pet Shop
@@ -276,25 +279,25 @@ def pet_home():
     conn.close()
     return render_template("pet_home.html", products=products)
 
-    # -----------------------------------------------------------------------------
-# DataHub (Required because base.html links to it)
 # -----------------------------------------------------------------------------
-@app.route("/datahub")
+# DataHub
+# -----------------------------------------------------------------------------
+@app.route("/datahub", methods=["GET", "POST"])
 @login_required
 def datahub():
     conn = get_db()
     cur = conn.cursor()
 
-    # Ensure table exists (safe on every run)
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS datahub_records (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        content TEXT NOT NULL,
-        created_at TEXT NOT NULL
-    );
-    """)
-    conn.commit()
+    if request.method == "POST":
+        cur.execute("""
+        INSERT INTO datahub_records (title, content, created_at)
+        VALUES (?, ?, ?);
+        """, (
+            request.form["title"],
+            request.form["content"],
+            datetime.now().isoformat()
+        ))
+        conn.commit()
 
     records = cur.execute(
         "SELECT * FROM datahub_records ORDER BY created_at DESC;"
@@ -303,36 +306,37 @@ def datahub():
 
     return render_template("datahub.html", records=records)
 
-
-
 # -----------------------------------------------------------------------------
 # Contact
 # -----------------------------------------------------------------------------
 @app.route("/contact", methods=["POST"])
 def contact():
-    name = request.form["name"]
-    email = request.form["email"]
-    phone = request.form["phone"]
-    message = request.form["message"]
-
     conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
+    conn.execute("""
     INSERT INTO contact_messages
     (name, email, phone, message, created_at)
     VALUES (?, ?, ?, ?, ?);
-    """, (name, email, phone, message, datetime.now().isoformat()))
+    """, (
+        request.form["name"],
+        request.form["email"],
+        request.form["phone"],
+        request.form["message"],
+        datetime.now().isoformat()
+    ))
     conn.commit()
     conn.close()
 
     try:
-        send_email("samifarhan64@gmail.com", "New Contact Message", message)
-    except:
-        pass
+        send_email(
+            "samifarhan64@gmail.com",
+            "New Contact Message",
+            request.form["message"]
+        )
+        flash("Message sent successfully")
+    except Exception as e:
+        flash("Message saved, but email failed")
 
-    flash("Message sent successfully")
     return redirect(url_for("index") + "#contact")
-
 
 # -----------------------------------------------------------------------------
 # Main
