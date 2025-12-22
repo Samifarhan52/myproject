@@ -119,7 +119,7 @@ def signup():
 
         if not is_strong_password(password):
             flash(
-                "Password must contain at least 1 uppercase letter, 1 number, and 1 special character.",
+                "Password must contain 1 uppercase letter, 1 number, and 1 special character.",
                 "error",
             )
             return redirect(url_for("signup"))
@@ -200,27 +200,20 @@ def datahub():
 
         if title and content:
             cur.execute(
-                """
-                INSERT INTO datahub_records (title, content, created_at)
-                VALUES (?, ?, ?)
-                """,
+                "INSERT INTO datahub_records (title, content, created_at) VALUES (?, ?, ?)",
                 (title, content, datetime.now().isoformat()),
             )
             conn.commit()
-            flash("Record added to DataHub.", "success")
+            flash("Record added.", "success")
         else:
-            flash("Both title and content are required.", "error")
+            flash("Both fields required.", "error")
 
     records = cur.execute(
         "SELECT * FROM datahub_records ORDER BY created_at DESC"
     ).fetchall()
     conn.close()
 
-    return render_template(
-        "datahub.html",
-        records=records,
-        user=current_user()
-    )
+    return render_template("datahub.html", records=records, user=current_user())
 
 
 # ---------------- BIKE RENTAL ----------------
@@ -230,11 +223,31 @@ def bike_rental():
     return render_template("bike_home.html", user=current_user())
 
 
-# ---------------- PET SHOP (MISSING ROUTE FIX) ----------------
+# ---------------- PET SHOP ----------------
 @app.route("/petshop")
 @login_required
 def pet_home():
     return render_template("pet_home.html", user=current_user())
+
+
+# ---------------- CONTACT (THIS WAS MISSING) ----------------
+@app.route("/contact", methods=["POST"])
+def contact():
+    name = request.form.get("name")
+    email = request.form.get("email")
+    message = request.form.get("message")
+
+    try:
+        send_email(
+            "samifarhan64@gmail.com",
+            "New Contact Message",
+            f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}",
+        )
+    except Exception as e:
+        print("EMAIL ERROR:", e)
+
+    flash("Message sent successfully.", "success")
+    return redirect(url_for("index"))
 
 
 # -----------------------------------------------------------------------------
