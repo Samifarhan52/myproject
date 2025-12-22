@@ -16,6 +16,8 @@ from flask import (
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from modules.email_utils import send_email
+import re
+
 
 # -----------------------------------------------------------------------------
 # App setup
@@ -235,6 +237,19 @@ def login_required(view_func):
     return wrapper
 
 
+def is_strong_password(password):
+    if len(password) < 8:
+        return False
+    if not re.search(r"[A-Z]", password):
+        return False
+    if not re.search(r"[0-9]", password):
+        return False
+    if not re.search(r"[^A-Za-z0-9]", password):
+        return False
+    return True
+
+
+
 # -----------------------------------------------------------------------------
 # Routes: Portfolio Home
 # -----------------------------------------------------------------------------
@@ -256,6 +271,13 @@ def signup():
         name = request.form.get("name", "").strip()
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "").strip()
+        if not is_strong_password(password):
+    flash(
+        "Password must contain at least 1 uppercase letter, 1 number, and 1 special character",
+        "danger"
+    )
+    return redirect(url_for("signup"))
+
 
         if not name or not email or not password:
             error = "All fields are required."
