@@ -223,12 +223,18 @@ def datahub():
     )
 
 
-# ---------------- BIKE RENTAL (MISSING ROUTE FIX) ----------------
+# ---------------- BIKE RENTAL ----------------
 @app.route("/bike-rental")
 @login_required
 def bike_rental():
-    # Temporary page so url_for('bike_rental') works
     return render_template("bike_home.html", user=current_user())
+
+
+# ---------------- PET SHOP (MISSING ROUTE FIX) ----------------
+@app.route("/petshop")
+@login_required
+def pet_home():
+    return render_template("pet_home.html", user=current_user())
 
 
 # -----------------------------------------------------------------------------
