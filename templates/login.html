@@ -18,7 +18,29 @@
           <label for="email">Email</label>
         </div>
         <div class="form-group floating">
-          <input type="password" id="password" name="password" required />
+          <label>Password</label>
+
+<div style="position: relative; max-width: 350px;">
+    <input
+        type="password"
+        id="password"
+        name="password"
+        required
+        style="width: 100%; padding-right: 40px;"
+    >
+
+    <span
+        onclick="togglePassword()"
+        style="
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        "
+    >👁</span>
+</div>
+
           <label for="password">Password</label>
         </div>
         <button type="submit" class="btn primary full-width">Login</button>
@@ -31,4 +53,12 @@
     </div>
   </div>
 </section>
+
+<script>
+function togglePassword() {
+    const pwd = document.getElementById("password");
+    pwd.type = pwd.type === "password" ? "text" : "password";
+}
+</script>
+
 {% endblock %}
