@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from datetime import datetime, date
+from datetime import datetime
 from functools import wraps
 import re
 
@@ -22,7 +22,9 @@ from modules.email_utils import send_email
 # App setup
 # -----------------------------------------------------------------------------
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "replace_this_with_a_better_random_secret")
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY", "replace_this_with_a_better_random_secret"
+)
 app.config["DATABASE"] = os.path.join(app.root_path, "database.db")
 
 
@@ -130,7 +132,9 @@ def current_user():
     if not uid:
         return None
     conn = get_db_connection()
-    user = conn.execute("SELECT * FROM users WHERE id = ?", (uid,)).fetchone()
+    user = conn.execute(
+        "SELECT * FROM users WHERE id = ?", (uid,)
+    ).fetchone()
     conn.close()
     return user
 
@@ -139,7 +143,7 @@ def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         if not session.get("user_id"):
-            flash("Please login first.")
+            flash("Please login first.", "error")
             return redirect(url_for("login"))
         return view(*args, **kwargs)
     return wrapped
@@ -171,27 +175,40 @@ def signup():
         password = request.form.get("password", "").strip()
 
         if not is_strong_password(password):
-            flash("Password must contain 1 uppercase letter, 1 number, and 1 special character.")
+            flash(
+                "Password must contain at least 1 uppercase letter, 1 number, and 1 special character.",
+                "error",
+            )
             return redirect(url_for("signup"))
 
         if not name or not email or not password:
-            flash("All fields are required.")
+            flash("All fields are required.", "error")
             return redirect(url_for("signup"))
 
         conn = get_db_connection()
-        if conn.execute("SELECT id FROM users WHERE email=?", (email,)).fetchone():
+        if conn.execute(
+            "SELECT id FROM users WHERE email = ?", (email,)
+        ).fetchone():
             conn.close()
-            flash("Email already exists.")
+            flash("Email already exists.", "error")
             return redirect(url_for("signup"))
 
         conn.execute(
-            "INSERT INTO users (name, email, password_hash, created_at) VALUES (?, ?, ?, ?)",
-            (name, email, generate_password_hash(password), datetime.now().isoformat()),
+            """
+            INSERT INTO users (name, email, password_hash, created_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                name,
+                email,
+                generate_password_hash(password),
+                datetime.now().isoformat(),
+            ),
         )
         conn.commit()
         conn.close()
 
-        flash("Account created. Please login.")
+        flash("Account created successfully. Please login.", "success")
         return redirect(url_for("login"))
 
     return render_template("signup.html", user=current_user())
@@ -205,15 +222,17 @@ def login():
         password = request.form.get("password", "").strip()
 
         conn = get_db_connection()
-        user = conn.execute("SELECT * FROM users WHERE email=?", (email,)).fetchone()
+        user = conn.execute(
+            "SELECT * FROM users WHERE email = ?", (email,)
+        ).fetchone()
         conn.close()
 
         if user and check_password_hash(user["password_hash"], password):
             session["user_id"] = user["id"]
-            flash("Logged in successfully.")
+            flash("Logged in successfully.", "success")
             return redirect(url_for("index"))
 
-        flash("Invalid email or password.")
+        flash("Invalid email or password.", "error")
 
     return render_template("login.html", user=current_user())
 
@@ -221,7 +240,7 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
-    flash("Logged out.")
+    flash("You have been logged out.", "success")
     return redirect(url_for("index"))
 
 
@@ -235,17 +254,30 @@ def datahub():
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         content = request.form.get("content", "").strip()
+
         if title and content:
             cur.execute(
-                "INSERT INTO datahub_records (title, content, created_at) VALUES (?, ?, ?)",
+                """
+                INSERT INTO datahub_records (title, content, created_at)
+                VALUES (?, ?, ?)
+                """,
                 (title, content, datetime.now().isoformat()),
             )
             conn.commit()
-            flash("Record added.")
+            flash("Record added to DataHub.", "success")
+        else:
+            flash("Both title and content are required.", "error")
 
-    records = cur.execute("SELECT * FROM datahub_records ORDER BY created_at DESC").fetchall()
+    records = cur.execute(
+        "SELECT * FROM datahub_records ORDER BY created_at DESC"
+    ).fetchall()
     conn.close()
-    return render_template("datahub.html", records=records, user=current_user())
+
+    return render_template(
+        "datahub.html",
+        records=records,
+        user=current_user()
+    )
 
 
 # -----------------------------------------------------------------------------
