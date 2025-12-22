@@ -60,63 +60,6 @@ def init_db():
     );
     """)
 
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS bikes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        type TEXT NOT NULL,
-        price_per_day REAL NOT NULL,
-        description TEXT,
-        image_url TEXT
-    );
-    """)
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS bike_bookings (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        bike_id INTEGER NOT NULL,
-        customer_name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        start_date TEXT NOT NULL,
-        end_date TEXT NOT NULL,
-        total_price REAL NOT NULL,
-        created_at TEXT NOT NULL
-    );
-    """)
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS pet_products (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        category TEXT NOT NULL,
-        price REAL NOT NULL,
-        description TEXT,
-        image_url TEXT
-    );
-    """)
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS pet_orders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        customer_name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        total_amount REAL NOT NULL,
-        created_at TEXT NOT NULL
-    );
-    """)
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS pet_order_items (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        order_id INTEGER NOT NULL,
-        product_name TEXT NOT NULL,
-        quantity INTEGER NOT NULL,
-        price_each REAL NOT NULL
-    );
-    """)
-
     conn.commit()
     conn.close()
 
@@ -278,6 +221,14 @@ def datahub():
         records=records,
         user=current_user()
     )
+
+
+# ---------------- BIKE RENTAL (MISSING ROUTE FIX) ----------------
+@app.route("/bike-rental")
+@login_required
+def bike_rental():
+    # Temporary page so url_for('bike_rental') works
+    return render_template("bike_home.html", user=current_user())
 
 
 # -----------------------------------------------------------------------------
